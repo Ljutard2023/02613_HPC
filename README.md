@@ -1,188 +1,85 @@
-# 🏠 Wall Heating – Mini-Projet HPC Python
-## Cours 02613 – Python and High Performance Computing
+# Wall Heating — 02613 HPC Mini-Project
+
+Simulation of steady-state heat distribution in 4,571 Swiss building floorplans,
+using the Jacobi iterative method to solve Laplace's equation.
+The goal is to optimise the reference implementation as much as possible.
 
 ---
 
-## 📋 RÉSUMÉ DU SUJET
-
-Le projet simule la distribution de chaleur dans 4 571 plans de bâtiments suisses.
-On modélise les murs intérieurs chauffants (25°C) et les murs porteurs froids (5°C),
-puis on calcule comment la chaleur se diffuse dans les pièces via **l'équation de Laplace**,
-résolue par la **méthode itérative de Jacobi**.
-
-Le script de référence fourni (`simulate.py`) est trop lent.
-**L'objectif est de l'optimiser le plus possible** en utilisant différentes
-techniques HPC (parallélisme CPU, Numba JIT, CUDA GPU, CuPy).
-
+## File structure
+Project/
+├── simulate.py              # Reference implementation (provided by course)
+├── jacobi_profile.py        # Line-by-line profiling script (Task 4)
+├── part1_explore.py         # Task 1-3: data exploration and visualisation
+├── part2_parallel.py        # Tasks 5-6: CPU parallelisation (static & dynamic)
+├── part3_numba.py           # Task 7: Numba JIT optimisation
+├── make_histogram.py        # Task 12: final statistics and histograms
+├── job_part1.sh             # LSF job: Part 1
+├── job_part1_kernprof.sh    # LSF job: kernprof profiling
+├── job_part2.sh             # LSF job: Part 2 (16 cores)
+├── job_part3.sh             # LSF job: Part 3 (8 cores)
+├── job_part4_cupy.sh        # LSF job: CuPy naive benchmark (GPU)
+├── job_cupy_optimized.sh    # LSF job: CuPy optimised benchmark (GPU)
+├── results_all.csv          # Final CSV results for all 4,571 buildings
+└── logs/                    # LSF job output logs
 ---
 
-## 👥 RÉPARTITION DU TRAVAIL (4 PERSONNES)
+## Installation
 
-```
-┌─────────────┬──────────────────────────────────────────────────────┐
-│  Personne   │  Travail                                             │
-├─────────────┼──────────────────────────────────────────────────────┤
-│  👩 ALICE   │  Partie 1 : Exploration, visualisation, timing,      │
-│  (part1)    │  profiling (Tâches 1–4)                              │
-├─────────────┼──────────────────────────────────────────────────────┤
-│  👨 BOB     │  Partie 2 : Parallélisation CPU statique & dynamique, │
-│  (part2)    │  loi d'Amdahl, graphes speed-up (Tâches 5–6)        │
-├─────────────┼──────────────────────────────────────────────────────┤
-│  👩 CARLA   │  Partie 3 : Numba JIT CPU, analyse cache, benchmark  │
-│  (part3)    │  (Tâche 7)                                           │
-├─────────────┼──────────────────────────────────────────────────────┤
-│  👨 DAMIEN  │  Partie 4 : GPU CUDA kernel (Numba), CuPy,           │
-│  (part4)    │  profiling nsys, analyse finale (Tâches 8–12)       │
-└─────────────┴──────────────────────────────────────────────────────┘
-```
-
----
-
-## 📁 STRUCTURE DES FICHIERS
-
-```
-wall_heating/
-│
-├── simulate.py              ← Script de référence (fourni par le cours)
-│
-├── jacobi_profile.py        ← Script pour kernprof (Tâche 4)
-│
-├── part1_explore.py         ← PARTIE 1 : Exploration & visualisation
-│                               → génère : part1_task1_input_data.png
-│                               → génère : part1_task3_simulation_results.png
-│
-├── part2_parallel.py        ← PARTIE 2 : Parallélisation CPU
-│                               → génère : part2_speedup.png
-│
-├── part3_numba.py           ← PARTIE 3 : Numba JIT CPU
-│
-├── part4_gpu.py             ← PARTIE 4 : GPU (CUDA + CuPy) + Analyse finale
-│                               → génère : part4_task12_analysis.png
-│                               → génère : results_all.csv
-│
-├── create_job_scripts.sh    ← Script qui crée tous les scripts SLURM
-│
-└── logs/                    ← Dossier pour les sorties des jobs SLURM
-```
-
----
-
-## 🚀 INSTALLATION
-
-Sur le cluster DTU HPC, dans ton environnement Python :
-
+On the DTU HPC cluster:
 ```bash
 pip install numpy matplotlib pandas numba cupy-cuda12x line_profiler
 ```
 
 ---
 
-## ▶️ UTILISATION
+## Usage
 
-### Sur ton ordinateur (test local sans GPU) :
+### Submit jobs on DTU HPC (LSF)
 ```bash
-# Partie 1 : exploration
+bsub < job_part1.sh             # Tasks 1-3: exploration, timing, visualisation
+bsub < job_part1_kernprof.sh    # Task 4: kernprof profiling
+bsub < job_part2.sh             # Tasks 5-6: CPU parallelisation speed-up
+bsub < job_part3.sh             # Task 7: Numba JIT benchmark
+bsub < job_part4_cupy.sh        # Task 9: CuPy naive GPU benchmark
+bsub < job_cupy_optimized.sh    # Task 10: CuPy optimised GPU benchmark
+```
+
+### Run locally (no GPU)
+```bash
 python part1_explore.py
-
-# Partie 2 : parallélisation (ajuster N selon ta machine)
 python part2_parallel.py 10 all
-
-# Partie 3 : Numba JIT
 python part3_numba.py 5
-
-# Partie 4 : analyse finale (sans GPU)
-python part4_gpu.py analyse 10
-```
-
-### Sur le cluster DTU HPC :
-```bash
-# Créer les scripts de job SLURM
-bash create_job_scripts.sh
-
-# Soumettre les jobs
-sbatch job_part1.sh
-sbatch job_part1_kernprof.sh
-sbatch job_part2.sh
-sbatch job_part3.sh
-sbatch job_part4_gpu.sh       ← nécessite un GPU
-sbatch job_part4_nsys.sh      ← profiling nsys
-
-# Pour tous les bâtiments (Tâche 12)
-sbatch job_part4_all_buildings.sh
+python make_histogram.py        # requires results_all.csv
 ```
 
 ---
 
-## 📐 EXPLICATIONS DES CONCEPTS CLÉS
+## Results summary
 
-### L'équation de Laplace et la méthode de Jacobi
-```
-Chaque point de la grille est mis à jour comme la MOYENNE de ses 4 voisins :
-    u[i,j] = (u[i-1,j] + u[i+1,j] + u[i,j-1] + u[i,j+1]) / 4
-
-On répète jusqu'à convergence (la grille ne change plus de plus de atol).
-```
-
-### Pourquoi c'est lent ?
-```
-514 × 514 = 264 196 points × 20 000 itérations = 5 milliards d'opérations
-```
-
-### Les 4 niveaux d'optimisation
-```
-1. Référence (NumPy)      : 1×        (base)
-2. Parallèle CPU (32 CPUs): ~20×      (multiprocessing)
-3. Numba JIT              : ~10-50×   (compilation native)
-4. GPU CuPy/CUDA          : ~50-200×  (milliers de threads GPU)
-```
+| Method                    | Speed-up | Estimated time (4,571 buildings) |
+|--------------------------|----------|----------------------------------|
+| Reference NumPy           | 1×       | 14.2 h                           |
+| Static CPU (16 workers)   | 4.7×     | 3.4 h                            |
+| Dynamic CPU (16 workers)  | 4.7×     | 3.4 h                            |
+| Numba JIT sequential      | 3.6×     | 3.0 h                            |
+| Numba JIT parallel (8T)   | 51×      | ~13 min                          |
+| CuPy naive (V100)         | 3.2×     | 3.4 h                            |
+| CuPy optimised (V100)     | 2351×    | ~18 s                            |
 
 ---
 
-## 📊 RÉSULTATS ATTENDUS (exemples)
+## Background
 
-| Méthode              | Temps (10 bâtiments) | Temps estimé (4571) |
-|---------------------|---------------------|---------------------|
-| Référence NumPy     | ~300s               | ~38h                |
-| Parallèle statique  | ~40s                | ~5h                 |
-| Parallèle dynamique | ~35s                | ~4.4h               |
-| Numba JIT           | ~15s                | ~1.9h               |
-| GPU CuPy            | ~5s                 | ~38min              |
-| GPU CUDA kernel     | ~8s                 | ~61min              |
+The Jacobi method updates each interior grid point as the average of its 4 neighbours:
+u[i,j] = (u[i-1,j] + u[i+1,j] + u[i,j-1] + u[i,j+1]) / 4
 
-*(Ces chiffres sont des estimations – tes résultats varieront selon le matériel)*
+Repeated until convergence (max change < atol) or max_iter reached.
+Grid size: 514×514 = 264,196 points × up to 20,000 iterations per building.
 
 ---
 
-## 📝 RAPPORT
+## Authors
 
-Le rapport doit être rendu en PDF sur DTU Learn avant le **4 mai 2025**.
-Il doit inclure :
-- Réponses aux 12 tâches
-- Graphes (speed-up, histogrammes)
-- Snippets de code pertinents
-- Analyse et conclusions
-
----
-
-## ❓ FAQ DÉBUTANT
-
-**Q : C'est quoi un "job SLURM" ?**
-> Sur un cluster HPC partagé, on ne peut pas lancer des calculs lourds directement.
-> On "soumet" un script à SLURM (le gestionnaire de ressources) qui l'exécute
-> quand un nœud de calcul est disponible.
-
-**Q : Pourquoi la 1ère exécution Numba est lente ?**
-> Numba compile le code Python en code machine la première fois (JIT = Just-In-Time).
-> C'est comme "installer" le programme → long une fois, mais rapide ensuite.
-> C'est pourquoi on fait un "warm-up" avant le benchmark.
-
-**Q : Pourquoi CuPy peut être plus lent que NumPy ?**
-> Envoyer les données RAM → mémoire GPU prend du temps (~milliseconde par bâtiment).
-> Si le calcul lui-même est court, ce coût fixe domine. Solution : envoyer
-> toutes les données d'un coup, calculer tout, récupérer tout (Tâche 10 fix).
-
-**Q : C'est quoi la différence entre statique et dynamique ?**
-> Statique : on divise le travail EN AVANCE en parts égales. Simple, mais
->   inefficace si certains bâtiments prennent beaucoup plus de temps que d'autres.
-> Dynamique : chaque worker prend un bâtiment à la fois dans une file.
->   Meilleur équilibrage de charge → généralement plus rapide.
+Ibrahim Kerpic (s224403), Sami Rana (s224386), Lucas Jutard (s253050)
+DTU — 02613 Python and High Performance Computing, April 2026

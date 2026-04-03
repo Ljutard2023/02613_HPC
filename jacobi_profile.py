@@ -1,11 +1,10 @@
 """
-jacobi_profile.py  –  Script à utiliser avec kernprof pour le profiling ligne-à-ligne.
+jacobi_profile.py - Line-by-line profiling script for the Jacobi function.
 
-Utilisation :
+Usage:
     kernprof -l -v jacobi_profile.py
 
-kernprof instrumente chaque ligne de la fonction marquée @profile
-et mesure combien de temps est passé sur chaque ligne.
+kernprof injects the @profile decorator and measures time spent on each line.
 """
 from os.path import join
 import numpy as np
@@ -21,47 +20,40 @@ def load_data(load_dir, bid):
     return u, interior_mask
 
 
-@profile  # ← décorateur SPÉCIAL kernprof (ne pas importer, kernprof l'injecte)
+@profile  # special decorator injected by kernprof — do not import
 def jacobi(u, interior_mask, max_iter, atol=1e-6):
-    """
-    Fonction Jacobi profilée ligne par ligne.
-    On utilise seulement 200 itérations pour ne pas attendre trop longtemps.
-    """
-    u = np.copy(u)                         # ligne 1 : copie de la grille
-    for i in range(max_iter):              # ligne 2 : boucle principale
-        # Calcul de la moyenne des 4 voisins pour tous les points intérieurs
-        # (opération matricielle NumPy = rapide, mais appelée 200× !)
-        u_new = 0.25 * (                   # ligne 3 : ← LIGNE LA PLUS LENTE
-            u[1:-1, :-2]                   #   voisin gauche
-          + u[1:-1, 2:]                    #   voisin droite
-          + u[:-2, 1:-1]                   #   voisin haut
-          + u[2:, 1:-1]                    #   voisin bas
+    """Reference Jacobi function instrumented for line profiling."""
+    u = np.copy(u)
+    for i in range(max_iter):
+        # Compute average of 4 neighbours for all interior points
+        u_new = 0.25 * (
+            u[1:-1, :-2]    # left neighbour
+          + u[1:-1, 2:]     # right neighbour
+          + u[:-2, 1:-1]    # top neighbour
+          + u[2:, 1:-1]     # bottom neighbour
         )
-        # Extraction des valeurs intérieures (indexation booléenne)
-        u_new_interior = u_new[interior_mask]  # ligne 4 : extraction masque
+        # Extract interior values via boolean mask
+        u_new_interior = u_new[interior_mask]
 
-        # Calcul de la variation maximale (critère de convergence)
-        delta = np.abs(                        # ligne 5 : ← 2ÈME PLUS LENTE
+        # Compute max change for convergence check
+        delta = np.abs(
             u[1:-1, 1:-1][interior_mask] - u_new_interior
         ).max()
 
-        # Mise à jour uniquement des points intérieurs
-        u[1:-1, 1:-1][interior_mask] = u_new_interior  # ligne 6 : mise à jour
+        # Update interior points only
+        u[1:-1, 1:-1][interior_mask] = u_new_interior
 
-        if delta < atol:                       # ligne 7 : test de convergence
+        if delta < atol:
             break
     return u
 
 
 if __name__ == '__main__':
-    # Chargement d'un seul bâtiment pour le profiling
     with open(join(LOAD_DIR, 'building_ids.txt'), 'r') as f:
         bid = f.readline().strip()
 
     u0, interior_mask = load_data(LOAD_DIR, bid)
 
-    # On profile seulement 200 itérations pour aller vite
-    print(f"Profiling de la fonction jacobi sur bâtiment {bid}...")
-    print("(200 itérations)")
+    print(f"Profiling jacobi on building {bid} (200 iterations)...")
     jacobi(u0, interior_mask, max_iter=200)
-    print("Profiling terminé.")
+    print("Done.")
