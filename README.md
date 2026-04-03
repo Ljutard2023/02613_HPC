@@ -11,7 +11,7 @@ The goal is to optimise the reference implementation as much as possible.
 Project/
 ├── simulate.py              # Reference implementation (provided by course)
 ├── jacobi_profile.py        # Line-by-line profiling script (Task 4)
-├── part1_explore.py         # Task 1-3: data exploration and visualisation
+├── part1_explore.py         # Tasks 1-3: data exploration and visualisation
 ├── part2_parallel.py        # Tasks 5-6: CPU parallelisation (static & dynamic)
 ├── part3_numba.py           # Task 7: Numba JIT optimisation
 ├── make_histogram.py        # Task 12: final statistics and histograms
@@ -19,11 +19,12 @@ Project/
 ├── job_part1_kernprof.sh    # LSF job: kernprof profiling
 ├── job_part2.sh             # LSF job: Part 2 (16 cores)
 ├── job_part3.sh             # LSF job: Part 3 (8 cores)
-├── job_part4_cupy.sh        # LSF job: CuPy naive benchmark (GPU)
-├── job_cupy_optimized.sh    # LSF job: CuPy optimised benchmark (GPU)
+├── job_part4_cupy.sh        # LSF job: Task 9 — CuPy naive benchmark (GPU)
+├── job_cupy_optimized.sh    # LSF job: Task 10 — CuPy optimised benchmark (GPU)
 ├── results_all.csv          # Final CSV results for all 4,571 buildings
 └── logs/                    # LSF job output logs
 ```
+
 ---
 
 ## Installation
@@ -40,11 +41,25 @@ pip install numpy matplotlib pandas numba cupy-cuda12x line_profiler
 ### Submit jobs on DTU HPC (LSF)
 ```bash
 bsub < job_part1.sh             # Tasks 1-3: exploration, timing, visualisation
-bsub < job_part1_kernprof.sh    # Task 4: kernprof profiling
+bsub < job_part1_kernprof.sh    # Task 4: kernprof line-by-line profiling
 bsub < job_part2.sh             # Tasks 5-6: CPU parallelisation speed-up
 bsub < job_part3.sh             # Task 7: Numba JIT benchmark
 bsub < job_part4_cupy.sh        # Task 9: CuPy naive GPU benchmark
 bsub < job_cupy_optimized.sh    # Task 10: CuPy optimised GPU benchmark
+```
+
+**Task 8 (custom CUDA kernel):** implemented using `numba.cuda.jit` inside
+`job_part4_cupy.sh`. The kernel assigns one GPU thread per grid point and
+performs one Jacobi iteration per kernel launch (ping-pong buffer pattern).
+It caused a segmentation fault on the DTU `gpuv100` queue due to a version
+incompatibility between Numba CUDA 0.60.0 and the installed CUDA toolkit.
+CuPy (Tasks 9-10) was used as the primary GPU solution instead.
+
+**Task 11 (optional):** not implemented.
+
+**Task 12 (full dataset analysis):**
+```bash
+python make_histogram.py        # generate histograms from results_all.csv
 ```
 
 ### Run locally (no GPU)
@@ -59,15 +74,15 @@ python make_histogram.py        # requires results_all.csv
 
 ## Results summary
 
-| Method                    | Speed-up | Estimated time (4,571 buildings) |
+| Method                   | Speed-up | Estimated time (4,571 buildings) |
 |--------------------------|----------|----------------------------------|
-| Reference NumPy           | 1×       | 14.2 h                           |
-| Static CPU (16 workers)   | 4.7×     | 3.4 h                            |
-| Dynamic CPU (16 workers)  | 4.7×     | 3.4 h                            |
-| Numba JIT sequential      | 3.6×     | 3.0 h                            |
-| Numba JIT parallel (8T)   | 51×      | ~13 min                          |
-| CuPy naive (V100)         | 3.2×     | 3.4 h                            |
-| CuPy optimised (V100)     | 2351×    | ~18 s                            |
+| Reference NumPy          | 1×       | 14.2 h                           |
+| Static CPU (16 workers)  | 4.7×     | 3.4 h                            |
+| Dynamic CPU (16 workers) | 4.7×     | 3.4 h                            |
+| Numba JIT sequential     | 3.6×     | 3.0 h                            |
+| Numba JIT parallel (8T)  | 51×      | ~13 min                          |
+| CuPy naive (V100)        | 3.2×     | 3.4 h                            |
+| CuPy optimised (V100)    | 2351×    | ~18 s                            |
 
 ---
 
@@ -77,9 +92,9 @@ The Jacobi method updates each interior grid point as the average of its 4 neigh
 ```bash
 u[i,j] = (u[i-1,j] + u[i+1,j] + u[i,j-1] + u[i,j+1]) / 4
 ```
+
 Repeated until convergence (max change < atol) or max_iter reached.
 Grid size: 514×514 = 264,196 points × up to 20,000 iterations per building.
-
 
 ---
 
