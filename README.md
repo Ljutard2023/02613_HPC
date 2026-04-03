@@ -74,11 +74,12 @@ python make_histogram.py        # requires results_all.csv
 ## Background
 
 The Jacobi method updates each interior grid point as the average of its 4 neighbours:
+```bash
 u[i,j] = (u[i-1,j] + u[i+1,j] + u[i,j-1] + u[i,j+1]) / 4
-
+```
 Repeated until convergence (max change < atol) or max_iter reached.
 Grid size: 514×514 = 264,196 points × up to 20,000 iterations per building.
-```
+
 
 ---
 
