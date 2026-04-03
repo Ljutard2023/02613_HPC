@@ -1,0 +1,9 @@
+=== Part 2 - CPU parallelisation ===
+Available CPUs: 16  |  Fri Apr  3 12:34:26 CEST 2026
+Available CPUs : 64
+Buildings used : 100
+
+=== STATIC SCHEDULING ===
+
+ Workers |   Time (s) |   Speed-up
+-----------------------------------

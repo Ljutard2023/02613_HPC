@@ -1,0 +1,108 @@
+=== Part 1 - Data exploration ===
+Job ID : 28139129  |  Node : n-62-31-5  |  Fri Apr  3 12:28:42 CEST 2026
+Dataset: 4571 buildings available.
+Sample IDs: ['10000', '10009', '10014', '10019', '10029']
+============================================================
+TASK 1 - Input data visualisation
+============================================================
+  Saved: part1_task1_input_data.png
+
+============================================================
+TASK 2 - Timing on 10 buildings
+============================================================
+  Loading    : 0.07s  (10 buildings)
+  Simulation : 97.30s  (10 buildings)
+  Total      : 97.37s  (10 buildings)
+  Per building: 9.74s
+
+  Estimated for 4571 buildings: 741.8 min (12.36 h)
+
+============================================================
+TASK 3 - Simulation results visualisation
+============================================================
+  Simulating building 10000 ... 6.9s
+  Simulating building 10009 ... 11.2s
+  Simulating building 10014 ... 17.6s
+  Simulating building 10019 ... 17.5s
+  Saved: part1_task3_simulation_results.png
+
+Part 1 complete.
+
+=== Timing reference script on 10 buildings ===
+building_id, mean_temp, std_temp, pct_above_18, pct_below_15
+10000, 14.01233878811275, 6.367431059312565, 30.941014791508444, 55.542295034537624
+10009, 11.000135812436373, 5.811144379826625, 16.6712734948236, 74.9723590310584
+10014, 14.744169941950119, 7.037733284673848, 38.26367541377415, 52.80837116508215
+10019, 14.735524480624482, 7.030325006703675, 38.14915412864569, 52.92926826787113
+10029, 10.616037322820358, 6.317331938274926, 18.25563221896085, 74.51301795448481
+10031, 12.507072852890545, 6.278432089100354, 24.044722033998173, 66.39513301711693
+10051, 13.289039951277402, 5.999085063388632, 25.97693550756574, 62.859923608050536
+10053, 11.366493551285709, 6.26121798185875, 19.9510754583921, 72.41052538787024
+10056, 14.220114507861702, 6.179461157398302, 31.763454814173965, 57.06174975667784
+10064, 12.71696893739585, 6.964227784263683, 28.79137124461432, 62.75688345539249
+=== Done Fri Apr  3 12:32:54 CEST 2026 ===
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 28139129: <wall_heat_p1> in cluster <dcc> Done
+
+Job <wall_heat_p1> was submitted from host <hpclogin2> by user <s253050> in cluster <dcc> at Fri Apr  3 12:28:41 2026
+Job was executed on host(s) <n-62-31-5>, in queue <hpc>, as user <s253050> in cluster <dcc> at Fri Apr  3 12:28:42 2026
+</zhome/3f/9/223204> was used as the home directory.
+</zhome/3f/9/223204/projects/02613_HPC/Project> was used as the working directory.
+Started at Fri Apr  3 12:28:42 2026
+Terminated at Fri Apr  3 12:32:54 2026
+Results reported at Fri Apr  3 12:32:54 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J wall_heat_p1
+#BSUB -o logs/part1_%J.out
+#BSUB -e logs/part1_%J.err
+#BSUB -n 1
+#BSUB -R "rusage[mem=4GB]"
+#BSUB -W 01:00
+#BSUB -q hpc
+
+source /zhome/3f/9/223204/projects/.venv/bin/activate
+mkdir -p logs
+
+echo "=== Part 1 - Data exploration ==="
+echo "Job ID : $LSB_JOBID  |  Node : $LSB_HOSTS  |  $(date)"
+
+python part1_explore.py
+
+echo ""
+echo "=== Timing reference script on 10 buildings ==="
+time python simulate.py 10
+
+echo "=== Done $(date) ==="
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   251.63 sec.
+    Max Memory :                                 92 MB
+    Average Memory :                             67.75 MB
+    Total Requested Memory :                     4096.00 MB
+    Delta Memory :                               4004.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                5
+    Run time :                                   252 sec.
+    Turnaround time :                            253 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/part1_28139129.err> for stderr output of this job.
+

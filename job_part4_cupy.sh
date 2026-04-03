@@ -9,7 +9,6 @@
 #BSUB -q gpuv100
 #BSUB -gpu "num=1:mode=exclusive_process"
 
-module load python3/3.9.23
 module load cuda/12.1
 source /zhome/3f/9/223204/projects/.venv/bin/activate
 

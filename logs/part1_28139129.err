@@ -1,0 +1,8 @@
+/zhome/3f/9/223204/projects/02613_HPC/Project/part1_explore.py:42: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout()
+/zhome/3f/9/223204/projects/02613_HPC/Project/part1_explore.py:117: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout()
+
+real	1m37.882s
+user	1m37.591s
+sys	0m0.113s

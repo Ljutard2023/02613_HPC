@@ -8,7 +8,6 @@
 #BSUB -W 01:00
 #BSUB -q hpc
 
-module load python3/3.9.23
 source /zhome/3f/9/223204/projects/.venv/bin/activate
 mkdir -p logs
 
