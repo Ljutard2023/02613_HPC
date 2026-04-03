@@ -7,6 +7,7 @@ The goal is to optimise the reference implementation as much as possible.
 ---
 
 ## File structure
+```bash
 Project/
 ├── simulate.py              Reference implementation (provided by course)
 ├── jacobi_profile.py        # Line-by-line profiling script (Task 4)
@@ -22,6 +23,7 @@ Project/
 ├── job_cupy_optimized.sh    # LSF job: CuPy optimised benchmark (GPU)
 ├── results_all.csv          # Final CSV results for all 4,571 buildings
 └── logs/                    # LSF job output logs
+```
 ---
 
 ## Installation
