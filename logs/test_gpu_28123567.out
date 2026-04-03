@@ -1,0 +1,66 @@
+CuPy version: 13.6.0
+GPU test OK: 6.0
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 28123567: <test_gpu> in cluster <dcc> Exited
+
+Job <test_gpu> was submitted from host <hpclogin2> by user <s253050> in cluster <dcc> at Mon Mar 30 10:25:04 2026
+Job was executed on host(s) <n-62-11-13>, in queue <gpuv100>, as user <s253050> in cluster <dcc> at Mon Mar 30 10:25:04 2026
+</zhome/3f/9/223204> was used as the home directory.
+</zhome/3f/9/223204/projects/02613_HPC/Project> was used as the working directory.
+Started at Mon Mar 30 10:25:04 2026
+Terminated at Mon Mar 30 10:25:12 2026
+Results reported at Mon Mar 30 10:25:12 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J test_gpu
+#BSUB -o logs/test_gpu_%J.out
+#BSUB -e logs/test_gpu_%J.err
+#BSUB -n 1
+#BSUB -R "rusage[mem=4GB]"
+#BSUB -W 00:10
+#BSUB -q gpuv100
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+module load python3/3.9.23
+module load cuda/12.1
+source /zhome/3f/9/223204/projects/ADLCV/adlcv-ex2_1/.venv/bin/activate
+
+python -c "
+import cupy as cp
+print('CuPy version:', cp.__version__)
+a = cp.array([1.0, 2.0, 3.0])
+print('GPU test OK:', a.sum())
+print('GPU:', cp.cuda.Device().name.decode())
+"
+
+------------------------------------------------------------
+
+Exited with exit code 1.
+
+Resource usage summary:
+
+    CPU time :                                   1.66 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     4096.00 MB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   8 sec.
+    Turnaround time :                            8 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/test_gpu_28123567.err> for stderr output of this job.
+

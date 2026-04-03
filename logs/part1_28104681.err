@@ -1,0 +1,14 @@
+Loaded dependency [python3/3.9.23]: sqlite3/3.50.1
+Loaded dependency [python3/3.9.23]: gcc/14.3.0-binutils-2.44
+Loaded module: python3/3.9.23
+
+Loading python3/3.9.23
+  Loading requirement: sqlite3/3.50.1 gcc/14.3.0-binutils-2.44
+/zhome/3f/9/223204/projects/02613_HPC/Project/part1_explore.py:76: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout()
+/zhome/3f/9/223204/projects/02613_HPC/Project/part1_explore.py:175: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
+  plt.tight_layout()
+
+real	1m50.858s
+user	1m50.164s
+sys	0m0.152s

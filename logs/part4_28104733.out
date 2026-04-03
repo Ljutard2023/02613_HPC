@@ -1,0 +1,74 @@
+=======================================================
+  PARTIE 4 – GPU (CUDA + CuPy) + Analyse finale
+=======================================================
+
+╔══════════════════════════════╗
+║  TÂCHE 8 – CUDA Kernel       ║
+╚══════════════════════════════╝
+  Warm-up GPU... === Terminé Wed Mar 25 19:00:10 CET 2026 ===
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 28104733: <wall_heat_p4> in cluster <dcc> Done
+
+Job <wall_heat_p4> was submitted from host <hpclogin1> by user <s253050> in cluster <dcc> at Wed Mar 25 18:57:42 2026
+Job was executed on host(s) <4*n-62-11-13>, in queue <gpuv100>, as user <s253050> in cluster <dcc> at Wed Mar 25 19:00:05 2026
+</zhome/3f/9/223204> was used as the home directory.
+</zhome/3f/9/223204/projects/02613_HPC/Project> was used as the working directory.
+Started at Wed Mar 25 19:00:05 2026
+Terminated at Wed Mar 25 19:00:10 2026
+Results reported at Wed Mar 25 19:00:10 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+#BSUB -J wall_heat_p4
+#BSUB -o logs/part4_%J.out
+#BSUB -e logs/part4_%J.err
+#BSUB -n 4
+#BSUB -R "span[hosts=1]"
+#BSUB -R "rusage[mem=8GB]"
+#BSUB -gpu "num=1:mode=exclusive_process"  # IMPORTANT : demander 1 GPU !
+#BSUB -W 01:00
+#BSUB -q gpuv100               # partition GPU sur DTU
+
+module load python3/3.9.23
+module load cuda/12.1
+source /zhome/3f/9/223204/projects/ADLCV/adlcv-ex2_1/.venv/bin/activate
+
+# AJOUTE CES LIGNES ICI :
+export CUTENSOR_PATH=$CUDA_PATH
+export CUPY_CACHE_DIR=$HOME/.cupy/kernel_cache
+export CUPY_ACCELERATORS="" # Désactive temporairement les accélérateurs complexes pour tester
+
+python part4_gpu.py all 10
+
+echo "=== Terminé $(date) ==="
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   2.16 sec.
+    Max Memory :                                 -
+    Average Memory :                             -
+    Total Requested Memory :                     32768.00 MB
+    Delta Memory :                               -
+    Max Swap :                                   -
+    Max Processes :                              -
+    Max Threads :                                -
+    Run time :                                   5 sec.
+    Turnaround time :                            148 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/part4_28104733.err> for stderr output of this job.
+
