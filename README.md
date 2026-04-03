@@ -9,7 +9,7 @@ The goal is to optimise the reference implementation as much as possible.
 ## File structure
 ```bash
 Project/
-├── simulate.py              Reference implementation (provided by course)
+├── simulate.py              # Reference implementation (provided by course)
 ├── jacobi_profile.py        # Line-by-line profiling script (Task 4)
 ├── part1_explore.py         # Task 1-3: data exploration and visualisation
 ├── part2_parallel.py        # Tasks 5-6: CPU parallelisation (static & dynamic)
